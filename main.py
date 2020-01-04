@@ -1,7 +1,5 @@
 import os
-#import magic
 import urllib.request
-#from app import app
 from flask import Flask, flash, request, redirect, render_template
 from werkzeug.utils import secure_filename
 
@@ -12,8 +10,10 @@ app = Flask(__name__)
 app.secret_key = "SIH"
 
 UPLOAD_FOLDER ='/home/kranthi-kiran/Desktop/app/uploads'
+##if using windows change the above path to store the uploaded files 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024
+# max size of 200MB
 
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
