@@ -2,6 +2,7 @@ import os
 import urllib.request
 from flask import Flask, flash, request, redirect, render_template
 from werkzeug.utils import secure_filename
+from pdftotext import text_Convertor
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
@@ -17,7 +18,10 @@ app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024
 
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-	
+
+def convertor():
+	convert = text_Convertor()
+
 @app.route('/')
 def upload_form():
 	return render_template('index.html')
@@ -37,6 +41,7 @@ def upload_file():
 			filename = secure_filename(file.filename)
 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 			flash('File successfully uploaded')
+			convertor()
 			return redirect('/')
 		else:
 			flash('Allowed file types are txt, pdf, png, jpg, jpeg, gif')
