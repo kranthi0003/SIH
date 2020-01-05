@@ -1,0 +1,12 @@
+'''
+Keywords Extraction Dependencies:
+
+pip3 install -U nltk
+pip3 install -U numpy
+python3 -m nltk.downloader all
+pip3 install rake-nltk
+
+'''
+
+
+

@@ -1,0 +1,26 @@
+h1{	
+	color:navy;
+	margin-left: 20px;
+}
+h2{
+	background-color:red;
+}
+h3.h3{
+	color:yellow;
+	background-color:blue;
+	font-size:100px;
+	margin:84px 10px 200px 50px;
+}
+#Id{
+	border:30px solid Green;
+	border-width: 10px;
+	margin-left: 200px;
+	background-color:violet;
+}
+h5{
+	margin-top: 200px;
+	background-color:green
+}
+h6{
+	
+}

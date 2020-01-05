@@ -1,0 +1,50 @@
+<!doctype html>
+<head>
+	<title>Python Flask</title>
+</head>
+<body>
+	<h2>Select a file to upload</h2>
+	<p>
+		{% with messages = get_flashed_messages() %}
+		  {% if messages %}
+			<ul class=flashes>
+			{% for message in messages %}
+			  <li>{{ message }}</li>
+			{% endfor %}
+			</ul>
+		  {% endif %}
+		{% endwith %}
+	</p>
+	<form method="post" action="/" enctype="multipart/form-data">
+	    <!--<dl>
+			<p>
+				<input type="file" name="file" autocomplete="off" required>
+			</p>
+	    </dl>
+	    <p>
+			<input type="submit" value="Submit">
+		</p>-->
+		{{ form1.hidden_tag() }}
+		{{ form1.file }}
+		{{ form1.submit }}
+	</form><br><br>
+
+	<form method="post" action="#" enctype="multipart/form-data">
+		{{ form2.hidden_tag() }}
+		{{ form2.search.label }}
+		{{ form2.search }}<br><br>
+		{{ form2.index.label }}
+		{{ form2.index }}<br><br>
+		{{ form2.submit }}
+
+		<br>
+			{% for item in res %}
+				<p style="font-size:25px;color:  #2e86c1;">		
+					</style>> 
+						{{ item }}
+						<br>
+				</p>
+			{% endfor %}
+	</form>
+</body>
+</html>
