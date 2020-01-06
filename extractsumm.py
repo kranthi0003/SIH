@@ -1,87 +1,69 @@
-#!/usr/bin/env python
-# coding: utf-8
+import re 
 import nltk
-from nltk.corpus import stopwords
-from nltk.cluster.util import cosine_distance
-import numpy as np
-import networkx as nx
- 
-def read_article(file_name):
-    file = open(file_name, "r")
-    filedata = file.readlines()
-    article = filedata[0].split(". ")
-    sentences = []
+import heapq
 
-    for sentence in article:
-        print(sentence)
-        sentences.append(sentence.replace("[^a-zA-Z]", " ").split(" "))
-    sentences.pop() 
-    
-    return sentences
+with open('text.txt', 'r') as file:
+    data = file.read().replace('\n', '')
 
-def sentence_similarity(sent1, sent2, stopwords=None):
-    if stopwords is None:
-        stopwords = []
- 
-    sent1 = [w.lower() for w in sent1]
-    sent2 = [w.lower() for w in sent2]
- 
-    all_words = list(set(sent1 + sent2))
- 
-    vector1 = [0] * len(all_words)
-    vector2 = [0] * len(all_words)
- 
-    # build the vector for the first sentence
-    for w in sent1:
-        if w in stopwords:
-            continue
-        vector1[all_words.index(w)] += 1
- 
-    # build the vector for the second sentence
-    for w in sent2:
-        if w in stopwords:
-            continue
-        vector2[all_words.index(w)] += 1
- 
-    return 1 - cosine_distance(vector1, vector2)
- 
-def build_similarity_matrix(sentences, stop_words):
-    # Create an empty similarity matrix
-    similarity_matrix = np.zeros((len(sentences), len(sentences)))
- 
-    for idx1 in range(len(sentences)):
-        for idx2 in range(len(sentences)):
-            if idx1 == idx2: #ignore if both are same sentences
-                continue 
-            similarity_matrix[idx1][idx2] = sentence_similarity(sentences[idx1], sentences[idx2], stop_words)
+#print(data)
 
-    return similarity_matrix
+#data_cleanerData = re.sub(r'[^0-9]',' ',data)
+#data_cleanedData = re.sub(r'\s+',' ', data)
+
+#print(data_cleanedData)
+
+data_cleanedData = re.sub(r'[^a-zA-Z.[^0-9]]',' ',data)
+data_cleanedData = re.sub(r'\s+',' ', data_cleanedData)
+
+#print(data_cleanedData)
+
+#creating sentence tokens
+sentences_tokens = nltk.sent_tokenize(data_cleanedData)
+
+words_tokens = nltk.word_tokenize(data_cleanedData)
 
 
-def generate_summary(file_name, top_n=20):
-    #nltk.download("stopwords")
-    stop_words = stopwords.words('english')
-    summarize_text = []
+# calculating the frequency
 
-    # Step 1 - Read text anc split it
-    sentences =  read_article(file_name)
+stopwords = nltk.corpus.stopwords.words('english')
 
-    # Step 2 - Generate Similary Martix across sentences
-    sentence_similarity_martix = build_similarity_matrix(sentences, stop_words)
+word_frequencies = dict()
 
-    # Step 3 - Rank sentences in similarity martix
-    sentence_similarity_graph = nx.from_numpy_array(sentence_similarity_martix)
-    scores = nx.pagerank(sentence_similarity_graph)
+for word in words_tokens:
+    if word not in stopwords:
+        if word not in word_frequencies.keys():
+            word_frequencies[word]=1
+        else:
+            word_frequencies[word]+=1
 
-    # Step 4 - Sort the rank and pick top sentences
-    ranked_sentence = sorted(((scores[i],s) for i,s in enumerate(sentences)), reverse=True)    
-    print("Indexes of top ranked_sentence order are ", ranked_sentence)    
+#print(word_frequencies) 
 
-    for i in range(top_n):
-      summarize_text.append(" ".join(ranked_sentence[i][1]))
+# calculating weigth frequency
 
-    # Step 5 - Offcourse, output the summarize texr
-    print("Summarize Text: \n", ". ".join(summarize_text))
+max_freq_word = max(word_frequencies.values())
 
-# let's begin
-generate_summary("text.txt", 30)
+for word in word_frequencies.keys():
+    word_frequencies[word] = word_frequencies[word]/max_freq_word
+
+#print(word_frequencies)
+
+#calculatng sentence score with each word weighted frequency
+
+sentences_scores = dict()
+#print(type(word_frequencies),type(sentences_scores))
+for sentence in sentences_tokens:
+    for word in nltk.word_tokenize(sentence.lower()):
+        if word in word_frequencies.keys():
+            if (len(sentence.split(' '))<30):
+                if sentence not in sentences_scores.keys():
+                    sentences_scores[sentence]=word_frequencies[word]
+                else:
+                    sentences_scores[sentence]+=word_frequencies[word]
+
+#print(sentences_scores)
+
+summary = heapq.nlargest(10, sentences_scores, key=sentences_scores.get)
+
+final_summary=""
+final_summary = final_summary.join(summary)
+print(final_summary)
